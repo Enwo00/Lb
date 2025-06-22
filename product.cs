@@ -1,70 +1,78 @@
 using System;
+using System.Collections.Generic;
 
-public class Product
+public class User
 {
-    private string name;
-    private decimal price;
-    private int quantity;
+    public string UserName { get; set; }
+    public string Email { get; set; }
+    private string _password;
 
-    public Product(string name, decimal price, int quantity)
+    public User(string userName, string email)
     {
-        Name = name;
-        Price = price;
-        this.quantity = quantity >= 0 ? quantity : 0;
+        UserName = userName;
+        Email = email;
     }
 
-    public string Name
+    public void SetPassword(string newPassword)
     {
-        get => name;
-        set
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("Назва товару не може бути порожньою!");
-            name = value;
-        }
+        _password = newPassword;
     }
 
-    public decimal Price
+    public bool Authenticate(string inputPassword)
     {
-        get => price;
-        set
-        {
-            if (value < 0)
-                throw new ArgumentException("Ціна не може бути від'ємною!");
-            price = value;
-        }
+        return _password == inputPassword;
     }
 
-    public int Quantity => quantity;
-
-    public decimal TotalValue => price * quantity;
-
-    public void Restock(int amount)
+    public virtual void DisplayInfo()
     {
-        if (amount <= 0)
-            Console.WriteLine("Кількість для постачання повинна бути додатньою!");
-        else
-            quantity += amount;
+        Console.WriteLine($"Ім'я: {UserName} | Email: {Email}");
+    }
+}
+
+public class Admin : User
+{
+    public Admin(string userName, string email) : base(userName, email) { }
+
+    public void BlockUser(User user)
+    {
+        Console.WriteLine($"Користувача {user.UserName} заблоковано.");
     }
 
-    public void Sell(int amount)
+    public override void DisplayInfo()
     {
-        if (amount <= 0)
-        {
-            Console.WriteLine("Кількість для продажу повинна бути додатньою!");
-        }
-        else if (amount > quantity)
-        {
-            Console.WriteLine("Недостатньо товару на складі!");
-        }
-        else
-        {
-            quantity -= amount;
-        }
+        base.DisplayInfo();
+        Console.WriteLine("Роль: Адміністратор");
+    }
+}
+
+public class Moderator : User
+{
+    public Moderator(string userName, string email) : base(userName, email) { }
+
+    public void ModerateContent()
+    {
+        Console.WriteLine("Контент модеровано.");
     }
 
-    public string GetInfo()
+    public override void DisplayInfo()
     {
-        return $"Товар: {name}, Ціна: {price} грн, Кількість: {quantity}, Загальна вартість: {TotalValue} грн";
+        base.DisplayInfo();
+        Console.WriteLine("Роль: Модератор");
+    }
+}
+
+public class RegularUser : User
+{
+    public RegularUser(string userName, string email) : base(userName, email) { }
+
+    public void PostComment()
+    {
+        Console.WriteLine("Коментар опубліковано.");
+    }
+
+    public override void DisplayInfo()
+    {
+        base.DisplayInfo();
+        Console.WriteLine("Роль: Звичайний користувач");
     }
 }

@@ -2,39 +2,53 @@ public class Program
 {
     public static void Main()
     {
-        Product apple = new Product("Яблуко", 5, 100);
-        Console.WriteLine(apple.GetInfo());
+       
+        Admin admin = new Admin("AdminUser", "admin@example.com");
+        admin.SetPassword("admin123");
 
-        apple.Sell(20);
-        Console.WriteLine(apple.GetInfo());
+        Moderator mod = new Moderator("ModUser", "mod@example.com");
+        mod.SetPassword("mod123");
 
-        apple.Restock(50);
-        Console.WriteLine(apple.GetInfo());
+        RegularUser user = new RegularUser("RegUser", "user@example.com");
+        user.SetPassword("user123");
 
-        apple.Price = 7;
-        Console.WriteLine(apple.GetInfo());
+      
+        List<User> users = new List<User> { admin, mod, user };
 
-        apple.Name = "Зелене яблуко";
-        Console.WriteLine(apple.GetInfo());
-
-        try
+        Console.WriteLine("=== Інформація про користувачів ===");
+        foreach (User u in users)
         {
-            apple.Price = -10;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Помилка: " + ex.Message);
+            u.DisplayInfo();
         }
 
-        try
+        Console.WriteLine("\n=== Тестування методів ===");
+
+        foreach (User u in users)
         {
-            apple.Name = "";
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Помилка: " + ex.Message);
+            if (u is Admin a)
+            {
+                a.BlockUser(user);
+            }
+            else if (u is Moderator m)
+            {
+                m.ModerateContent();
+            }
+            else if (u is RegularUser r)
+            {
+                r.PostComment();
+            }
         }
 
-        apple.Sell(200); 
+        Console.WriteLine("\n=== Перевірка аутентифікації ===");
+
+       
+        Console.WriteLine($"{admin.UserName}: " +
+            (admin.Authenticate("admin123") ? "Успішна аутентифікація" : "Невірний пароль"));
+
+        Console.WriteLine($"{mod.UserName}: " +
+            (mod.Authenticate("wrongpass") ? "Успішна аутентифікація" : "Невірний пароль"));
+
+        Console.WriteLine($"{user.UserName}: " +
+            (user.Authenticate("user123") ? "Успішна аутентифікація" : "Невірний пароль"));
     }
 }
